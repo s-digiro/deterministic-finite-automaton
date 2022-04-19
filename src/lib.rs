@@ -10,15 +10,15 @@ pub struct DFA<StateType, AlphabetType> {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum DFAResult<S> {
+pub enum Status<S> {
     Accept(S),
     Reject(S),
 }
 
 impl<S, A> DFA<S, A>
 where
-    S: Eq + Hash + Clone + std::fmt::Display,
-    A: Eq + Hash + Clone + std::fmt::Display,
+    S: Eq + Hash + Clone,
+    A: Eq + Hash + Clone,
 {
     pub fn new(
         states: impl IntoIterator<Item = S>,
@@ -56,23 +56,17 @@ where
         &self.accept
     }
 
-    pub fn input(&self, s: impl IntoIterator<Item = A>) -> DFAResult<S> {
-        eprintln!("Starting DFA");
+    pub fn input(&self, s: impl IntoIterator<Item = A>) -> Status<S> {
         let mut state = self.start.clone();
 
         for c in s.into_iter() {
-            eprintln!("  State: {}, Input: {}", state, c);
             state = (self.transition)(state, c);
         }
 
         if self.accept.contains(&state) {
-            eprintln!("  Finished DFA. Final State: Accept({})", state);
-            eprintln!();
-            DFAResult::Accept(state)
+            Status::Accept(state)
         } else {
-            eprintln!("  Finished DFA. Final State: Reject({})", state);
-            eprintln!();
-            DFAResult::Reject(state)
+            Status::Reject(state)
         }
     }
 }
@@ -124,10 +118,10 @@ mod tests {
             [0],
         );
 
-        assert!(dfa.input("0".chars()) == DFAResult::Accept(0));
-        assert!(dfa.input("1".chars()) == DFAResult::Reject(1));
-        assert!(dfa.input("11".chars()) == DFAResult::Accept(0));
-        assert!(dfa.input("10".chars()) == DFAResult::Reject(2));
-        assert!(dfa.input("1001".chars()) == DFAResult::Accept(0));
+        assert!(dfa.input("0".chars()) == Status::Accept(0));
+        assert!(dfa.input("1".chars()) == Status::Reject(1));
+        assert!(dfa.input("11".chars()) == Status::Accept(0));
+        assert!(dfa.input("10".chars()) == Status::Reject(2));
+        assert!(dfa.input("1001".chars()) == Status::Accept(0));
     }
 }
