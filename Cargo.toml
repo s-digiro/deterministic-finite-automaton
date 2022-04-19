@@ -1,6 +1,6 @@
 [package]
 name = "deterministic-finite-automaton"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Simple generic implementation of a deterministic finite automaton"
 license = "MIT"
